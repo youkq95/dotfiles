@@ -1,0 +1,21 @@
+# 所有机器都忽略
+README.md
+LICENSE
+
+# Windows 忽略 Linux 专用文件
+{{ if eq .chezmoi.os "windows" -}}
+.tmux.conf
+.Xresources
+.xinitrc
+.config/i3/
+.config/sway/
+.config/waybar/
+run_once_before_setup.sh*
+{{ end -}}
+
+# Linux 忽略 Windows 专用文件
+{{ if eq .chezmoi.os "linux" -}}
+Microsoft.PowerShell_profile.ps1
+.config/WindowsTerminal/
+run_once_before_setup.ps1*
+{{ end -}}

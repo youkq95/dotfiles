@@ -1,0 +1,6 @@
+# Ignore OS-specific generated files
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

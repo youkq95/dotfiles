@@ -1,0 +1,18 @@
+# chezmoi 全局配置
+[git]
+    autoCommit = false
+    autoPush = false
+
+[keep]
+    dirs = [".chezmoi", ".git"]
+
+{{ if eq .chezmoi.os "windows" -}}
+# Windows 用 VS Code 编辑
+[edit]
+    command = "code"
+    args = ["--wait"]
+{{ else -}}
+# Linux 用 neovim
+[edit]
+    command = "nvim"
+{{ end -}}

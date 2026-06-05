@@ -1,0 +1,31 @@
+# PowerShell script - Windows initial setup
+# chezmoi runs this once on first apply
+
+Write-Host "=== Starting Windows dotfiles setup ===" -ForegroundColor Green
+
+# Create bin directory
+$binDir = "$env:USERPROFILE\bin"
+if (-not (Test-Path $binDir)) {
+    New-Item -ItemType Directory -Path $binDir -Force | Out-Null
+    Write-Host "  [OK] Created $binDir"
+}
+
+# Check common tools
+Write-Host "`nChecking installed tools..."
+$tools = @(
+    @{Name="Git"; Check="git --version"},
+    @{Name="VS Code"; Check="code --version"},
+    @{Name="chezmoi"; Check="chezmoi --version"}
+)
+
+foreach ($tool in $tools) {
+    try {
+        $null = Invoke-Expression $tool.Check 2>$null
+        Write-Host "  [OK] $($tool.Name) installed" -ForegroundColor Green
+    } catch {
+        Write-Host "  [..] $($tool.Name) not found" -ForegroundColor Yellow
+    }
+}
+
+Write-Host "`n=== Setup complete! ===" -ForegroundColor Green
+Write-Host "Tip: run 'chezmoi update' to sync latest configs" -ForegroundColor Cyan

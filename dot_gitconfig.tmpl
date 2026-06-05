@@ -1,0 +1,42 @@
+[user]
+	name = youkq95
+	email = youkq@foxmail.com
+
+[init]
+	defaultBranch = main
+
+[core]
+{{ if eq .chezmoi.os "windows" -}}
+	autocrlf = true
+	editor = code --wait
+{{ else -}}
+	autocrlf = input
+	editor = nvim
+{{ end -}}
+	excludesfile = {{ .chezmoi.homeDir | quote }}/.config/git/ignore
+
+{{ if eq .chezmoi.os "linux" -}}
+[pager]
+	diff = delta
+{{ end -}}
+
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+
+[push]
+	autoSetupRemote = true
+
+[fetch]
+	prune = true
+
+[alias]
+	st = status
+	co = checkout
+	br = branch
+	ci = commit
+	cia = commit --amend
+	lg = log --graph --oneline --all --decorate
+	df = diff
+	dc = diff --cached
+	undo = reset --soft HEAD~1
+	pushf = push --force-with-lease
