@@ -3,28 +3,15 @@
 # Hostname: {{ .chezmoi.hostname }}
 # ============================================================
 
-{{ if eq .chezmoi.hostname "ps" -}}
-# ─── 本机 (ps) ───
+{{ if eq .chezmoi.hostname "DESKTOP-KNUNJ5V" -}}
+# ─── 家里 Windows PC (homepc) ───
 
-# 连接家里 Windows PC
-Host homepc
-    HostName 202.112.180.24
-    Port 22
-    User kos
-    IdentityFile ~/.ssh/id_rsa
-
-{{ else if eq .chezmoi.hostname "DESKTOP-KNUNJ5V" -}}
-# ─── 家里 Windows PC ───
-
-# 连接服务器 ps
+# 连接服务器
 Host ps
-    HostName <server-ip>
+    HostName 222.28.103.242
     Port 22
     User kos
     IdentityFile ~/.ssh/id_rsa
-
-{{ else -}}
-# ─── 通用配置 ───
 
 {{ end -}}
 
