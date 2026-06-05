@@ -1,0 +1,15 @@
+#!/bin/bash
+# chezmoi: run_once_before
+# 修正 SSH 目录与文件权限
+
+SSH_DIR="{{ .chezmoi.homeDir }}/.ssh"
+
+if [ -d "$SSH_DIR" ]; then
+    chmod 700 "$SSH_DIR"
+    chmod 600 "$SSH_DIR/config" 2>/dev/null || true
+    chmod 600 "$SSH_DIR/id_rsa" 2>/dev/null || true
+    chmod 644 "$SSH_DIR/id_rsa.pub" 2>/dev/null || true
+    chmod 644 "$SSH_DIR/*.pub" 2>/dev/null || true
+    chmod 644 "$SSH_DIR/authorized_keys" 2>/dev/null || true
+    chmod 644 "$SSH_DIR/known_hosts" 2>/dev/null || true
+fi

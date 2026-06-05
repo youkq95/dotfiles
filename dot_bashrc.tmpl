@@ -18,8 +18,8 @@ export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 export EDITOR="code --wait"
 export VISUAL="code --wait"
 {{ else -}}
-export EDITOR="nvim"
-export VISUAL="nvim"
+export EDITOR="hx"
+export VISUAL="hx"
 {{ end -}}
 
 # ─── Prompt ───
@@ -91,3 +91,54 @@ fi
 if command -v chezmoi &>/dev/null; then
     source <(chezmoi completion bash 2>/dev/null) || true
 fi
+
+# ─── 今日记录 ───
+alias today='hx ~/brain/today.md'
+
+k() {
+  printf "\n- %s: %s\n" "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> ~/brain/log.md
+}
+
+{{ if and (eq .chezmoi.os "linux") (eq .chezmoi.hostname "ps") -}}
+# ─── 代理设置 ───
+proxy_on() {
+    local proxy_host="202.112.180.24"
+    local http_port="10808"
+    local socks_port="10808"
+
+    export http_proxy="http://${proxy_host}:${http_port}"
+    export https_proxy="http://${proxy_host}:${http_port}"
+    export all_proxy="socks5://${proxy_host}:${socks_port}"
+
+    export HTTP_PROXY="${http_proxy}"
+    export HTTPS_PROXY="${https_proxy}"
+    export ALL_PROXY="${all_proxy}"
+
+    echo "✅ 代理已开启 (HTTP Proxy: ${http_proxy})"
+}
+
+proxy_off() {
+    unset http_proxy
+    unset https_proxy
+    unset all_proxy
+
+    unset HTTP_PROXY
+    unset HTTPS_PROXY
+    unset ALL_PROXY
+
+    echo "❌ 代理已关闭"
+}
+
+proxy_status() {
+    if [ -n "$http_proxy" ]; then
+        echo "当前代理状态: 开启"
+        echo "-------------------------"
+        echo "http_proxy:   $http_proxy"
+        echo "https_proxy:  $https_proxy"
+        echo "all_proxy:    $all_proxy"
+        echo "-------------------------"
+    else
+        echo "当前代理状态: 关闭"
+    fi
+}
+{{ end -}}

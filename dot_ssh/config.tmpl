@@ -1,0 +1,41 @@
+# ============================================================
+# SSH config — chezmoi managed
+# Hostname: {{ .chezmoi.hostname }}
+# ============================================================
+
+{{ if eq .chezmoi.hostname "ps" -}}
+# ─── 本机 (ps) ───
+
+# 连接家里 Windows PC
+Host homepc
+    HostName 202.112.180.24
+    Port 22
+    User kos
+    IdentityFile ~/.ssh/id_rsa
+
+{{ else if eq .chezmoi.hostname "DESKTOP-KNUNJ5V" -}}
+# ─── 家里 Windows PC ───
+
+# 连接服务器 ps
+Host ps
+    HostName <server-ip>
+    Port 22
+    User kos
+    IdentityFile ~/.ssh/id_rsa
+
+{{ else -}}
+# ─── 通用配置 ───
+
+{{ end -}}
+
+# ─── 全局默认配置 ───
+Host *
+    # 默认使用 id_rsa
+    IdentityFile ~/.ssh/id_rsa
+    # 保持连接活跃
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    # 如果连接断开自动重试
+    TCPKeepAlive yes
+    # 严格主机密钥检查
+    StrictHostKeyChecking ask
