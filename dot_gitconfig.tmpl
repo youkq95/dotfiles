@@ -20,8 +20,9 @@
 	diff = delta
 {{ end -}}
 
-[url "git@github.com:"]
-	insteadOf = https://github.com/
+# Using HTTPS with gh credential helper
+[credential]
+	helper = !gh auth git-credential
 
 [push]
 	autoSetupRemote = true
