@@ -10,6 +10,11 @@ if [ -d "$SSH_DIR" ]; then
     chmod 600 "$SSH_DIR/id_rsa" 2>/dev/null || true
     chmod 644 "$SSH_DIR/id_rsa.pub" 2>/dev/null || true
     chmod 644 "$SSH_DIR/*.pub" 2>/dev/null || true
-    chmod 644 "$SSH_DIR/authorized_keys" 2>/dev/null || true
+    chmod 600 "$SSH_DIR/authorized_keys" 2>/dev/null || true
     chmod 644 "$SSH_DIR/known_hosts" 2>/dev/null || true
+    # authorized_keys.d 目录及内部 .pub 文件
+    if [ -d "$SSH_DIR/authorized_keys.d" ]; then
+        chmod 755 "$SSH_DIR/authorized_keys.d"
+        chmod 644 "$SSH_DIR/authorized_keys.d"/*.pub 2>/dev/null || true
+    fi
 fi
