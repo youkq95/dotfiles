@@ -15,6 +15,13 @@ Host ps
 
 {{ end -}}
 
+# ─── 连接其他机器 ───
+Host lab
+    HostName 222.28.103.241
+    Port 2222
+    User ykq
+    IdentityFile ~/.ssh/id_rsa
+
 # ─── 全局默认配置 ───
 Host *
     # 默认使用 id_rsa
