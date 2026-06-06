@@ -11,6 +11,8 @@ LICENSE
 .config/sway/
 .config/waybar/
 run_once_before_setup.sh*
+run_once_assemble-authorized-keys.sh*
+run_fix-ssh-perms.sh*
 {{ end -}}
 
 # Linux 忽略 Windows 专用文件
@@ -19,4 +21,6 @@ Microsoft.PowerShell_profile.ps1
 .config/WindowsTerminal/
 run_once_before_setup.ps1*
 setup.ps1*
+run_once_before_assemble-authorized-keys.ps1*
+run_fix-ssh-perms.ps1*
 {{ end -}}

@@ -1,0 +1,30 @@
+{{ if eq .chezmoi.os "linux" -}}
+exit 0
+{{ end -}}
+# chezmoi: run
+# 修正 SSH 目录与文件权限 (Windows 版)
+
+$sshDir = "$env:USERPROFILE\.ssh"
+
+if (Test-Path $sshDir) {
+    # Windows 上使用 icacls 设置权限
+    # 所有者完全控制，其他用户只读
+    icacls $sshDir /inheritance:r /grant "Yuyu:(OI)(CI)F" /grant "SYSTEM:(OI)(CI)F" > $null 2>&1
+
+    $configFile = "$sshDir\config"
+    if (Test-Path $configFile) {
+        icacls $configFile /inheritance:r /grant "Yuyu:F" > $null 2>&1
+    }
+
+    $keysDir = "$sshDir\authorized_keys.d"
+    if (Test-Path $keysDir) {
+        Get-ChildItem "$keysDir\*.pub" | ForEach-Object {
+            icacls $_.FullName /inheritance:r /grant "Yuyu:F" > $null 2>&1
+        }
+    }
+
+    $authKeys = "$sshDir\authorized_keys"
+    if (Test-Path $authKeys) {
+        icacls $authKeys /inheritance:r /grant "Yuyu:F" > $null 2>&1
+    }
+}
