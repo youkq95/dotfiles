@@ -99,7 +99,7 @@ k() {
   printf "\n- %s: %s\n" "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> ~/brain/log.md
 }
 
-{{ if and (eq .chezmoi.os "linux") (eq .chezmoi.hostname "ps") -}}
+{{ if and (eq .chezmoi.os "linux") (or (eq .chezmoi.hostname "ps") (eq .chezmoi.hostname "gpu-public") (eq .chezmoi.hostname "lab24") (eq .chezmoi.hostname "lab148")) -}}
 # ─── 代理设置 ───
 proxy_on() {
     local proxy_host="202.112.180.24"
