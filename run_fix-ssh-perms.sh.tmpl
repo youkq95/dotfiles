@@ -1,20 +1,43 @@
 #!/bin/bash
 # chezmoi: run
-# 修正 SSH 目录与文件权限
+# 修正 SSH 目录与文件权限 (跨平台)
+
+{{ if eq .chezmoi.os "windows" -}}
+# ═══════════════════════════════════════
+# Windows
+# ═══════════════════════════════════════
+
+$sshDir = "$env:USERPROFILE\.ssh"
+if (Test-Path $sshDir) {
+    icacls $sshDir /inheritance:r /grant "Yuyu:(OI)(CI)F" /grant "SYSTEM:(OI)(CI)F" > $null 2>&1
+    $configFile = "$sshDir\config"
+    if (Test-Path $configFile) { icacls $configFile /inheritance:r /grant "Yuyu:F" > $null 2>&1 }
+    $keysDir = "$sshDir\authorized_keys.d"
+    if (Test-Path $keysDir) {
+        Get-ChildItem "$keysDir\*.pub" | ForEach-Object { icacls $_.FullName /inheritance:r /grant "Yuyu:F" > $null 2>&1 }
+    }
+    $authKeys = "$sshDir\authorized_keys"
+    if (Test-Path $authKeys) { icacls $authKeys /inheritance:r /grant "Yuyu:F" > $null 2>&1 }
+}
+
+{{ else -}}
+# ═══════════════════════════════════════
+# Linux
+# ═══════════════════════════════════════
 
 SSH_DIR="{{ .chezmoi.homeDir }}/.ssh"
 
 if [ -d "$SSH_DIR" ]; then
     chmod 700 "$SSH_DIR"
     chmod 600 "$SSH_DIR/config" 2>/dev/null || true
-    chmod 600 "$SSH_DIR/id_rsa" 2>/dev/null || true
-    chmod 644 "$SSH_DIR/id_rsa.pub" 2>/dev/null || true
-    chmod 644 "$SSH_DIR/*.pub" 2>/dev/null || true
+    chmod 600 "$SSH_DIR/id_rsa" "$SSH_DIR/id_ed25519" 2>/dev/null || true
+    chmod 644 "$SSH_DIR/id_rsa.pub" "$SSH_DIR/id_ed25519.pub" 2>/dev/null || true
     chmod 600 "$SSH_DIR/authorized_keys" 2>/dev/null || true
     chmod 644 "$SSH_DIR/known_hosts" 2>/dev/null || true
-    # authorized_keys.d 目录及内部 .pub 文件
     if [ -d "$SSH_DIR/authorized_keys.d" ]; then
         chmod 755 "$SSH_DIR/authorized_keys.d"
         chmod 644 "$SSH_DIR/authorized_keys.d"/*.pub 2>/dev/null || true
     fi
 fi
+
+{{ end -}}
