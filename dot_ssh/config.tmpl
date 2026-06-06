@@ -43,7 +43,7 @@ Host lab148
     User ykq
     IdentityFile ~/.ssh/id_ed25519
 
-{{ else if eq .chezmoi.hostname "lab26" -}}
+{{ else if or (eq .chezmoi.hostname "lab26") (eq .chezmoi.hostname "gpu-public") -}}
 # ─── lab26 (Ubuntu VM) ───
 Host ps
     HostName 222.28.103.242
