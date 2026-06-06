@@ -17,16 +17,8 @@ if (Get-Command node -ErrorAction SilentlyContinue) {
     Write-Host "  [!!] 需要先安装 Node.js: https://nodejs.org" -ForegroundColor Red
 }
 {{ else -}}
-# Linux
+# Linux — 使用官方安装脚本
 PI_BIN="{{ .chezmoi.homeDir }}/.local/bin/pi"
-
-if ! command -v node &>/dev/null; then
-    echo "  [!!] 需要先安装 Node.js"
-    echo "      推荐用 nvm 安装:"
-    echo "      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash"
-    echo "      nvm install --lts"
-    exit 0
-fi
 
 CURRENT=""
 if command -v pi &>/dev/null; then
@@ -35,24 +27,26 @@ fi
 
 echo "  [..] 当前: pi ${CURRENT:-未安装}"
 
-# 通过 npm 安装/更新
-if [ -n "$CURRENT" ]; then
-    echo "  [..] 检查更新..."
-    npm update -g --ignore-scripts @earendil-works/pi-coding-agent 2>&1 | tail -1
+if [ -z "$CURRENT" ]; then
+    echo "  [..] 正在安装 pi (官方脚本)..."
+    curl -fsSL https://pi.dev/install.sh | sh 2>&1 | tail -3
 else
-    echo "  [..] 正在安装 pi..."
-    npm install -g --ignore-scripts @earendil-works/pi-coding-agent 2>&1 | tail -1
+    echo "  [..] pi 已安装，跳过"
 fi
 
 NEW_VER="$(pi --version 2>/dev/null || echo '?')"
 echo "  [OK] pi $NEW_VER"
 
-# 如果 pi-config 仓库存在，初始化配置
+# ─── 初始化 pi-config ───
 PI_CONFIG_DIR="{{ .chezmoi.homeDir }}/pi-config"
-if [ -d "$PI_CONFIG_DIR" ]; then
-    if [ ! -L "{{ .chezmoi.homeDir }}/.pi/agent/config" ]; then
-        echo "  [..] pi-config 仓库已存在，可手动链接:"
-        echo "      ln -sf $PI_CONFIG_DIR {{ .chezmoi.homeDir }}/.pi/agent/config"
+if [ ! -d "$PI_CONFIG_DIR" ]; then
+    echo "  [..] 克隆 pi-config 仓库..."
+    if command -v gh &>/dev/null && gh auth status 2>/dev/null >&2; then
+        gh repo clone youkq95/pi-config "$PI_CONFIG_DIR" 2>&1 | tail -1
+        echo "  [OK] pi-config 已克隆到 $PI_CONFIG_DIR"
+    else
+        echo "  [..] gh 未登录，跳过克隆 pi-config"
+        echo "      之后可手动: gh repo clone youkq95/pi-config ~/pi-config"
     fi
 fi
 {{ end -}}
