@@ -1,0 +1,67 @@
+#!/bin/bash
+# chezmoi: run_once
+# 安装/更新 gh (GitHub CLI) — 无需 sudo
+
+set -euo pipefail
+
+GH_BIN="{{ .chezmoi.homeDir }}/.local/bin/gh"
+MIN_VERSION="2.50.0"
+
+install_gh() {
+    echo "  [..] 正在安装 gh..."
+
+    # 检测架构
+    case "$(uname -m)" in
+        x86_64)  arch="amd64" ;;
+        aarch64) arch="arm64" ;;
+        *)       echo "  [!!] 不支持的架构: $(uname -m)"; exit 1 ;;
+    esac
+
+    # 获取最新版本号
+    latest_url="https://api.github.com/repos/cli/cli/releases/latest"
+    tag=$(curl -sL "$latest_url" | grep -oP '"tag_name": "\K[^"]+') || {
+        echo "  [!!] 获取最新版本失败，请检查网络"; exit 1
+    }
+    version="${tag#v}"
+    echo "  [..] 最新版本: $version"
+
+    # 下载并解压
+    tmpdir=$(mktemp -d)
+    tarball="gh_${version}_linux_${arch}.tar.gz"
+    download_url="https://github.com/cli/cli/releases/download/${tag}/${tarball}"
+
+    echo "  [..] 下载 $download_url"
+    curl -sL "$download_url" -o "$tmpdir/gh.tar.gz"
+
+    tar xzf "$tmpdir/gh.tar.gz" -C "$tmpdir"
+    cp "$tmpdir/gh_${version}_linux_${arch}/bin/gh" "$GH_BIN"
+    chmod +x "$GH_BIN"
+
+    rm -rf "$tmpdir"
+    echo "  [OK] gh $version 已安装到 $GH_BIN"
+}
+
+# ─── 主逻辑 ───
+mkdir -p "$(dirname "$GH_BIN")"
+
+if [ ! -f "$GH_BIN" ]; then
+    install_gh
+else
+    installed_ver=$("$GH_BIN" version 2>/dev/null | grep -oP 'version \K[0-9]+\.[0-9]+\.[0-9]+' || echo "0.0.0")
+    echo "  [..] 当前版本: gh $installed_ver"
+
+    # 用版本号比较（只比较 major.minor）
+    if [ "$(echo "$installed_ver" | cut -d. -f1-2)" = "$(echo "$MIN_VERSION" | cut -d. -f1-2)" ] || \
+       [ "$(printf '%s\n' "$installed_ver" "$MIN_VERSION" | sort -V | head -1)" != "$installed_ver" ]; then
+        echo "  [OK] gh 已是最新 ($installed_ver)"
+    else
+        echo "  [..] gh $installed_ver 需要更新..."
+        install_gh
+    fi
+fi
+
+# 确保在 PATH 中
+if ! command -v gh &>/dev/null; then
+    echo "  [!] 请将 $GH_BIN 所在目录添加到 PATH"
+    echo "      export PATH=\"\$HOME/.local/bin:\$PATH\""
+fi
