@@ -3,10 +3,8 @@
 # 修正 SSH 目录与文件权限 (跨平台)
 
 {{ if eq .chezmoi.os "windows" -}}
-# ═══════════════════════════════════════
-# Windows
-# ═══════════════════════════════════════
-
+# Windows — 通过 bash 调用 PowerShell
+powershell -NoLogo -NonInteractive -Command - << 'PSEOF'
 $sshDir = "$env:USERPROFILE\.ssh"
 if (Test-Path $sshDir) {
     icacls $sshDir /inheritance:r /grant "Yuyu:(OI)(CI)F" /grant "SYSTEM:(OI)(CI)F" > $null 2>&1
@@ -19,12 +17,11 @@ if (Test-Path $sshDir) {
     $authKeys = "$sshDir\authorized_keys"
     if (Test-Path $authKeys) { icacls $authKeys /inheritance:r /grant "Yuyu:F" > $null 2>&1 }
 }
+PSEOF
+exit $?
 
 {{ else -}}
-# ═══════════════════════════════════════
 # Linux
-# ═══════════════════════════════════════
-
 SSH_DIR="{{ .chezmoi.homeDir }}/.ssh"
 
 if [ -d "$SSH_DIR" ]; then

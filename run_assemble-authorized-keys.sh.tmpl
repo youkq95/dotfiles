@@ -4,9 +4,10 @@
 
 {{ if eq .chezmoi.os "windows" -}}
 # ═══════════════════════════════════════
-# Windows — 使用 PowerShell 实现
+# Windows — 通过 bash 调用 PowerShell
 # ═══════════════════════════════════════
 
+powershell -NoLogo -NonInteractive -Command - << 'PSEOF'
 $sshDir = "$env:USERPROFILE\.ssh"
 $keysDir = "$sshDir\authorized_keys.d"
 $authKeys = "$sshDir\authorized_keys"
@@ -33,6 +34,8 @@ Get-ChildItem "$keysDir\*.pub" | ForEach-Object {
 }
 
 Write-Host "  [OK] Generated $authKeys from $keysDir"
+PSEOF
+exit $?
 
 {{ else -}}
 # ═══════════════════════════════════════
