@@ -44,9 +44,12 @@ if [ ! -d "$PI_CONFIG_DIR" ]; then
     if command -v gh &>/dev/null && gh auth status 2>/dev/null >&2; then
         gh repo clone youkq95/pi-config "$PI_CONFIG_DIR" 2>&1 | tail -1
         echo "  [OK] pi-config 已克隆到 $PI_CONFIG_DIR"
+    elif command -v git &>/dev/null; then
+        git clone https://github.com/youkq95/pi-config.git "$PI_CONFIG_DIR" 2>&1 | tail -1
+        echo "  [OK] pi-config 已克隆到 $PI_CONFIG_DIR"
     else
-        echo "  [..] gh 未登录，跳过克隆 pi-config"
-        echo "      之后可手动: gh repo clone youkq95/pi-config ~/pi-config"
+        echo "  [..] git 不可用，跳过克隆 pi-config"
+        echo "      之后可手动: git clone https://github.com/youkq95/pi-config.git ~/pi-config"
     fi
 fi
 {{ end -}}

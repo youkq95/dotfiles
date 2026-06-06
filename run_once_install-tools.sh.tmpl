@@ -85,13 +85,19 @@ else
     echo "  [OK] hx 已安装 ($(hx --version 2>/dev/null | head -1))"
 fi
 
-# ── fzf ──
+# ── fzf (使用 amd64/arm64 架构名) ──
 install_fzf() {
     local tag; tag=$(curl -sL "https://api.github.com/repos/junegunn/fzf/releases/latest" | grep -oP '"tag_name": "\K[^"]+') || return 1
     local version="${tag#v}"
+    local fzf_arch
+    case "$(uname -m)" in
+        x86_64)  fzf_arch="amd64" ;;
+        aarch64) fzf_arch="arm64" ;;
+        *)       echo "  [!!] 不支持的架构"; return 1 ;;
+    esac
     local tmpdir; tmpdir=$(mktemp -d)
     echo "  [..] 下载 fzf $version"
-    curl -sL "https://github.com/junegunn/fzf/releases/download/${tag}/fzf-${version}-linux_${arch}.tar.gz" -o "$tmpdir/fzf.tar.gz"
+    curl -sL "https://github.com/junegunn/fzf/releases/download/${tag}/fzf-${version}-linux_${fzf_arch}.tar.gz" -o "$tmpdir/fzf.tar.gz"
     tar xzf "$tmpdir/fzf.tar.gz" -C "$tmpdir"
     cp "$tmpdir/fzf" "$BIN_DIR/fzf"
     chmod +x "$BIN_DIR/fzf"
