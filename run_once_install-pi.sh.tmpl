@@ -1,0 +1,58 @@
+#!/bin/bash
+# chezmoi: run_once
+# 安装/更新 pi coding agent
+
+{{ if eq .chezmoi.os "windows" -}}
+# Windows — 需要 Node.js
+$piBin = "$env:USERPROFILE\AppData\Roaming\npm\pi.cmd"
+if (Get-Command node -ErrorAction SilentlyContinue) {
+    $current = $null
+    if (Test-Path $piBin) { $current = & $piBin --version 2>$null }
+    $tag = "latest"
+    Write-Host "  [..] 安装 pi coding agent..." -ForegroundColor Yellow
+    npm install -g --ignore-scripts @earendil-works/pi-coding-agent@$tag 2>&1 | Out-Null
+    $newVer = & pi --version 2>$null
+    Write-Host "  [OK] pi $newVer 已安装" -ForegroundColor Green
+} else {
+    Write-Host "  [!!] 需要先安装 Node.js: https://nodejs.org" -ForegroundColor Red
+}
+{{ else -}}
+# Linux
+PI_BIN="{{ .chezmoi.homeDir }}/.local/bin/pi"
+
+if ! command -v node &>/dev/null; then
+    echo "  [!!] 需要先安装 Node.js"
+    echo "      推荐用 nvm 安装:"
+    echo "      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash"
+    echo "      nvm install --lts"
+    exit 0
+fi
+
+CURRENT=""
+if command -v pi &>/dev/null; then
+    CURRENT=$(pi --version 2>/dev/null || echo "")
+fi
+
+echo "  [..] 当前: pi ${CURRENT:-未安装}"
+
+# 通过 npm 安装/更新
+if [ -n "$CURRENT" ]; then
+    echo "  [..] 检查更新..."
+    npm update -g --ignore-scripts @earendil-works/pi-coding-agent 2>&1 | tail -1
+else
+    echo "  [..] 正在安装 pi..."
+    npm install -g --ignore-scripts @earendil-works/pi-coding-agent 2>&1 | tail -1
+fi
+
+NEW_VER="$(pi --version 2>/dev/null || echo '?')"
+echo "  [OK] pi $NEW_VER"
+
+# 如果 pi-config 仓库存在，初始化配置
+PI_CONFIG_DIR="{{ .chezmoi.homeDir }}/pi-config"
+if [ -d "$PI_CONFIG_DIR" ]; then
+    if [ ! -L "{{ .chezmoi.homeDir }}/.pi/agent/config" ]; then
+        echo "  [..] pi-config 仓库已存在，可手动链接:"
+        echo "      ln -sf $PI_CONFIG_DIR {{ .chezmoi.homeDir }}/.pi/agent/config"
+    fi
+fi
+{{ end -}}
