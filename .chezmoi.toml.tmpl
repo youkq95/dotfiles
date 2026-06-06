@@ -6,6 +6,11 @@
 [keep]
     dirs = [".chezmoi", ".git"]
 
+# 按机器自定义数据
+[data]
+    # 校园网内机器才需要代理
+    proxy_enabled = {{ if or (eq .chezmoi.hostname "localhost") (eq .chezmoi.hostname "ps") (eq .chezmoi.hostname "DESKTOP-KNUNJ5V") }}true{{ else }}false{{ end }}
+
 {{ if eq .chezmoi.os "windows" -}}
 # Windows 用 VS Code 编辑
 [edit]

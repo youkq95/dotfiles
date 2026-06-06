@@ -41,3 +41,11 @@
 	dc = diff --cached
 	undo = reset --soft HEAD~1
 	pushf = push --force-with-lease
+
+{{ if .proxy_enabled | default false -}}
+# Proxy settings (校园网)
+[http]
+	proxy = http://202.112.180.24:10808
+[https]
+	proxy = http://202.112.180.24:10808
+{{ end -}}
