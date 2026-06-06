@@ -96,8 +96,22 @@ install_fzf() {
         *)       echo "  [!!] 不支持的架构"; return 1 ;;
     esac
     local tmpdir; tmpdir=$(mktemp -d)
+    local url="https://github.com/junegunn/fzf/releases/download/${tag}/fzf-${version}-linux_${fzf_arch}.tar.gz"
     echo "  [..] 下载 fzf $version"
-    curl -sL "https://github.com/junegunn/fzf/releases/download/${tag}/fzf-${version}-linux_${fzf_arch}.tar.gz" -o "$tmpdir/fzf.tar.gz"
+    local retries=3
+    while [ $retries -gt 0 ]; do
+        if curl -fsSL "$url" -o "$tmpdir/fzf.tar.gz"; then
+            break
+        fi
+        retries=$((retries - 1))
+        echo "  [..] 下载失败，重试 ($((3-retries))/3)..."
+        sleep 2
+    done
+    if [ ! -f "$tmpdir/fzf.tar.gz" ] || [ ! -s "$tmpdir/fzf.tar.gz" ]; then
+        echo "  [!!] fzf 下载失败，跳过"
+        rm -rf "$tmpdir"
+        return 1
+    fi
     tar xzf "$tmpdir/fzf.tar.gz" -C "$tmpdir"
     cp "$tmpdir/fzf" "$BIN_DIR/fzf"
     chmod +x "$BIN_DIR/fzf"
