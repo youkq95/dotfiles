@@ -1,135 +1,108 @@
 #!/bin/bash
 # chezmoi: run_once
-# 安装常用工具 (helix, fzf) — 无需 sudo
+# 安装常用工具 (helix, fzf) — 支持 Linux / Windows
 
 set -euo pipefail
+
+{{ if eq .chezmoi.os "windows" -}}
+# ═══════════════════════════════════════
+# Windows 安装
+# ═══════════════════════════════════════
+
+$binDir = "$env:USERPROFILE\bin"
+if (-not (Test-Path $binDir)) { New-Item -ItemType Directory -Path $binDir -Force | Out-Null }
+
+function Get-Version($repo) {
+    try { $r = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases/latest" -UseBasicParsing; return $r.tag_name.TrimStart('v') } catch { return $null }
+}
+
+# ── helix ──
+$hxVer = Get-Version "helix-editor/helix"
+if ($hxVer) {
+    $hxBin = "$binDir\hx.exe"
+    if (-not (Test-Path $hxBin)) {
+        Write-Host "  [..] 安装 helix $hxVer ..." -ForegroundColor Yellow
+        $url = "https://github.com/helix-editor/helix/releases/download/v${hxVer}/helix-${hxVer}-x86_64-windows.zip"
+        $tmp = "$env:TEMP\helix.zip"; Invoke-WebRequest -Uri $url -OutFile $tmp -UseBasicParsing
+        $d = "$env:TEMP\helix"; Expand-Archive -Path $tmp -DestinationPath $d -Force
+        Copy-Item "$d\hx.exe" $hxBin -Force
+        Remove-Item $tmp -Force; Remove-Item $d -Recurse -Force
+        Write-Host "  [OK] helix $hxVer 已安装" -ForegroundColor Green
+    } else { Write-Host "  [OK] helix 已安装" -ForegroundColor Green }
+}
+
+# ── fzf ──
+$fzfVer = Get-Version "junegunn/fzf"
+if ($fzfVer) {
+    $fzfBin = "$binDir\fzf.exe"
+    if (-not (Test-Path $fzfBin)) {
+        Write-Host "  [..] 安装 fzf $fzfVer ..." -ForegroundColor Yellow
+        $url = "https://github.com/junegunn/fzf/releases/download/v${fzfVer}/fzf-${fzfVer}-windows_amd64.zip"
+        $tmp = "$env:TEMP\fzf.zip"; Invoke-WebRequest -Uri $url -OutFile $tmp -UseBasicParsing
+        $d = "$env:TEMP\fzf"; Expand-Archive -Path $tmp -DestinationPath $d -Force
+        Copy-Item "$d\fzf.exe" $fzfBin -Force
+        Remove-Item $tmp -Force; Remove-Item $d -Recurse -Force
+        Write-Host "  [OK] fzf $fzfVer 已安装" -ForegroundColor Green
+    } else { Write-Host "  [OK] fzf 已安装" -ForegroundColor Green }
+}
+
+{{ else -}}
+# ═══════════════════════════════════════
+# Linux 安装
+# ═══════════════════════════════════════
 
 BIN_DIR="{{ .chezmoi.homeDir }}/.local/bin"
 mkdir -p "$BIN_DIR"
 
-# 检测架构
 case "$(uname -m)" in
     x86_64)  arch="x86_64" ;;
     aarch64) arch="aarch64" ;;
-    *)       echo "  [!!] 不支持的架构: $(uname -m)"; exit 1 ;;
+    *)       echo "  [!!] 不支持的架构"; exit 1 ;;
 esac
 
-# ──────────────────────────────────────
-# helix (hx)
-# ──────────────────────────────────────
+# ── helix ──
 install_helix() {
-    local current="$1"
-
-    echo "  [..] 获取 helix 最新版本..."
-    local tag
-    tag=$(curl -sL "https://api.github.com/repos/helix-editor/helix/releases/latest" | grep -oP '"tag_name": "\K[^"]+') || {
-        echo "  [!!] 获取 helix 版本失败"; return 1
-    }
+    local tag; tag=$(curl -sL "https://api.github.com/repos/helix-editor/helix/releases/latest" | grep -oP '"tag_name": "\K[^"]+') || return 1
     local version="${tag#v}"
-    echo "  [..] 最新版本: $version (当前: $current)"
-
-    if [ "$current" = "$version" ]; then
-        echo "  [OK] helix 已是最新"
-        return 0
-    fi
-
-    local tmpdir
-    tmpdir=$(mktemp -d)
+    local tmpdir; tmpdir=$(mktemp -d)
     local tarball="helix-${version}-${arch}-linux.tar.xz"
-    local url="https://github.com/helix-editor/helix/releases/download/${tag}/${tarball}"
-
-    echo "  [..] 下载 $url"
-    curl -sL "$url" -o "$tmpdir/helix.tar.xz"
-
+    echo "  [..] 下载 helix $version"
+    curl -sL "https://github.com/helix-editor/helix/releases/download/${tag}/${tarball}" -o "$tmpdir/helix.tar.xz"
     tar xf "$tmpdir/helix.tar.xz" -C "$tmpdir"
     cp "$tmpdir/helix-${version}-${arch}-linux/hx" "$BIN_DIR/hx"
     chmod +x "$BIN_DIR/hx"
-
-    # 复制 runtime（语法高亮等）
-    local runtime_dir="{{ .chezmoi.homeDir }}/.config/helix/runtime"
-    mkdir -p "$(dirname "$runtime_dir")"
+    local runtime="{{ .chezmoi.homeDir }}/.config/helix/runtime"
     if [ -d "$tmpdir/helix-${version}-${arch}-linux/runtime" ]; then
-        rm -rf "$runtime_dir"
-        cp -r "$tmpdir/helix-${version}-${arch}-linux/runtime" "$runtime_dir"
-        echo "  [..] helix runtime 已安装到 $runtime_dir"
+        rm -rf "$runtime"; cp -r "$tmpdir/helix-${version}-${arch}-linux/runtime" "$(dirname "$runtime")/"
     fi
-
     rm -rf "$tmpdir"
     echo "  [OK] helix $version 已安装"
 }
 
-# ──────────────────────────────────────
-# fzf
-# ──────────────────────────────────────
+if ! command -v hx &>/dev/null; then
+    install_helix
+else
+    echo "  [OK] hx 已安装 ($(hx --version 2>/dev/null | head -1))"
+fi
+
+# ── fzf ──
 install_fzf() {
-    local current="$1"
-
-    echo "  [..] 获取 fzf 最新版本..."
-    local tag
-    tag=$(curl -sL "https://api.github.com/repos/junegunn/fzf/releases/latest" | grep -oP '"tag_name": "\K[^"]+') || {
-        echo "  [!!] 获取 fzf 版本失败"; return 1
-    }
+    local tag; tag=$(curl -sL "https://api.github.com/repos/junegunn/fzf/releases/latest" | grep -oP '"tag_name": "\K[^"]+') || return 1
     local version="${tag#v}"
-    echo "  [..] 最新版本: $version (当前: $current)"
-
-    if [ "$current" = "$version" ]; then
-        echo "  [OK] fzf 已是最新"
-        return 0
-    fi
-
-    local tmpdir
-    tmpdir=$(mktemp -d)
-    local tarball="fzf-${version}-linux_${arch}.tar.gz"
-    local url="https://github.com/junegunn/fzf/releases/download/${tag}/${tarball}"
-
-    echo "  [..] 下载 $url"
-    curl -sL "$url" -o "$tmpdir/fzf.tar.gz"
-
+    local tmpdir; tmpdir=$(mktemp -d)
+    echo "  [..] 下载 fzf $version"
+    curl -sL "https://github.com/junegunn/fzf/releases/download/${tag}/fzf-${version}-linux_${arch}.tar.gz" -o "$tmpdir/fzf.tar.gz"
     tar xzf "$tmpdir/fzf.tar.gz" -C "$tmpdir"
     cp "$tmpdir/fzf" "$BIN_DIR/fzf"
     chmod +x "$BIN_DIR/fzf"
-
     rm -rf "$tmpdir"
     echo "  [OK] fzf $version 已安装"
 }
 
-# ──────────────────────────────────────
-# 主逻辑
-# ──────────────────────────────────────
-echo ""
-echo "  ╔══════════════════════════════╗"
-echo "  ║   安装常用工具 (Linux)        ║"
-echo "  ╚══════════════════════════════╝"
-echo ""
-
-# ── helix ──
-echo "  ── helix ──"
-CUR_HX=""
-if command -v hx &>/dev/null; then
-    CUR_HX=$(hx --version 2>/dev/null | head -1 | grep -oP '\d+\.\d+\.\d+' || echo "")
-fi
-if [ -z "$CUR_HX" ]; then
-    echo "  [..] helix 未安装，正在安装..."
-    install_helix ""
+if ! command -v fzf &>/dev/null; then
+    install_fzf
 else
-    echo "  [..] 当前: hx $CUR_HX"
-    install_helix "$CUR_HX"
+    echo "  [OK] fzf 已安装 ($(fzf --version 2>/dev/null | awk '{print $1}'))"
 fi
-echo ""
 
-# ── fzf ──
-echo "  ── fzf ──"
-CUR_FZF=""
-if command -v fzf &>/dev/null; then
-    CUR_FZF=$(fzf --version 2>/dev/null | awk '{print $1}' || echo "")
-fi
-if [ -z "$CUR_FZF" ]; then
-    echo "  [..] fzf 未安装，正在安装..."
-    install_fzf ""
-else
-    echo "  [..] 当前: fzf $CUR_FZF"
-    install_fzf "$CUR_FZF"
-fi
-echo ""
-
-echo "  [OK] 工具安装完成"
+{{ end -}}
