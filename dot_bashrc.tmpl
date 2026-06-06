@@ -11,15 +11,6 @@ export PATH="$HOME/bin:$HOME/scoop/shims:/c/Program Files/nodejs:$PATH"
 {{ else -}}
 # Linux: 标准路径
 export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
-# Pi standalone Node.js (如果存在)
-if [ -d "$HOME/.local/share/pi-node" ]; then
-    for pi_node_dir in "$HOME/.local/share/pi-node"/node-*/bin; do
-        if [ -d "$pi_node_dir" ]; then
-            export PATH="$pi_node_dir:$PATH"
-            break
-        fi
-    done
-fi
 {{ end -}}
 
 # ─── Editor ───
