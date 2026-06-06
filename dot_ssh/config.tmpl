@@ -16,6 +16,18 @@ Host ps
 {{ end -}}
 
 # ─── 连接其他机器 ───
+Host lab24
+    HostName 202.112.180.24
+    Port 22
+    User ykq
+    IdentityFile ~/.ssh/id_rsa
+
+Host lab26
+    HostName 202.112.180.26
+    Port 22
+    User ykq
+    IdentityFile ~/.ssh/id_rsa
+
 Host lab148
     HostName 222.28.103.241
     Port 2222
