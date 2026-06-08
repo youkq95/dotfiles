@@ -109,6 +109,32 @@ Host lab148
     User ykq
     IdentityFile ~/.ssh/id_ed25519
 
+{{ else if eq .chezmoi.hostname "PUERSAI-HPC" -}}
+# ─── PUERSAI-HPC (Windows HPC) ───
+Host ps
+    HostName 222.28.103.242
+    Port 22
+    User kos
+    IdentityFile ~/.ssh/id_ed25519
+
+Host lab24
+    HostName 202.112.180.24
+    Port 22
+    User ykq
+    IdentityFile ~/.ssh/id_ed25519
+
+Host lab26
+    HostName 202.112.180.26
+    Port 22
+    User ykq
+    IdentityFile ~/.ssh/id_ed25519
+
+Host lab148
+    HostName 222.28.103.241
+    Port 2222
+    User ykq
+    IdentityFile ~/.ssh/id_ed25519
+
 {{ end -}}
 
 # ─── 全局默认配置 ───
