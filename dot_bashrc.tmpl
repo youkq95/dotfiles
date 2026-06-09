@@ -99,7 +99,7 @@ k() {
   printf "\n- %s: %s\n" "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> ~/brain/log.md
 }
 
-{{ if and (eq .chezmoi.os "linux") (or (eq .chezmoi.hostname "ps") (eq .chezmoi.hostname "gpu-public") (eq .chezmoi.hostname "lab24") (eq .chezmoi.hostname "lab148")) -}}
+{{ if and (eq .chezmoi.os "linux") .proxy_enabled -}}
 # ─── 代理设置 ───
 proxy_on() {
     local proxy_host="202.112.180.24"
@@ -141,4 +141,7 @@ proxy_status() {
         echo "当前代理状态: 关闭"
     fi
 }
+
+# 默认开启代理
+proxy_on
 {{ end -}}
