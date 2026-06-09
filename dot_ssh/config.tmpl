@@ -5,6 +5,12 @@
 
 {{ if eq .chezmoi.hostname "ps" -}}
 # ─── ps (Ubuntu 服务器) ───
+Host ykq42
+    HostName 222.28.103.242
+    Port 22
+    User ykq
+    IdentityFile ~/.ssh/id_rsa
+
 Host lab24
     HostName 202.112.180.24
     Port 22
