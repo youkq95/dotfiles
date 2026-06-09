@@ -124,7 +124,7 @@ proxy_on() {
     export HTTPS_PROXY="${https_proxy}"
     export ALL_PROXY="${all_proxy}"
 
-    echo "✅ 代理已开启 (HTTP Proxy: ${http_proxy})"
+    [[ $- == *i* ]] && echo "✅ 代理已开启 (HTTP Proxy: ${http_proxy})"
 }
 
 proxy_off() {
