@@ -99,6 +99,16 @@ k() {
   printf "\n- %s: %s\n" "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> ~/brain/log.md
 }
 
+# ─── Starship Prompt ───
+if command -v starship &>/dev/null; then
+    eval "$(starship init bash)"
+fi
+
+# ─── zoxide (智能目录跳转) ───
+if command -v zoxide &>/dev/null; then
+    eval "$(zoxide init bash --cmd j)"
+fi
+
 {{ if and (eq .chezmoi.os "linux") .proxy_enabled -}}
 # ─── 代理设置 ───
 proxy_on() {
