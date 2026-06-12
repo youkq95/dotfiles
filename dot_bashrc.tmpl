@@ -4,6 +4,9 @@
 # Hostname: {{ .chezmoi.hostname }}
 # ============================================================
 
+# Only run for interactive shells (SFTP/SCP compatibility)
+[[ $- != *i* ]] && return
+
 # ─── PATH ───
 {{ if eq .chezmoi.os "windows" -}}
 # Windows: 添加 chezmoi 和常用工具到 PATH
@@ -152,6 +155,6 @@ proxy_status() {
     fi
 }
 
-# 默认开启代理
-proxy_on
+# 默认开启代理（仅交互式 shell）
+[[ $- == *i* ]] && proxy_on
 {{ end -}}
