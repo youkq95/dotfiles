@@ -12,8 +12,16 @@
 # Windows: 添加 chezmoi 和常用工具到 PATH
 export PATH="$HOME/bin:$HOME/scoop/shims:/c/Program Files/nodejs:$PATH"
 {{ else -}}
-# Linux: 标准路径
-export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
+# Linux: 标准路径 (仅添加尚未存在的路径，防止重复)
+add_path() {
+    case ":$PATH:" in
+        *:"$1":*) ;;
+        *) export PATH="$1:$PATH" ;;
+    esac
+}
+add_path "$HOME/.local/bin"
+add_path "$HOME/go/bin"
+add_path "$HOME/bin"
 {{ end -}}
 
 # ─── Editor ───
@@ -82,11 +90,16 @@ export HISTCONTROL=ignoreboth:erasedups
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
-# ─── Node.js ───
+# ─── Node.js (fnm) ───
 {{ if eq .chezmoi.os "windows" -}}
-# 如果使用 fnm/nvm
 if [ -f "$HOME/.fnm/fnm.sh" ]; then
     source "$HOME/.fnm/fnm.sh"
+fi
+{{ else -}}
+export FNM_DIR="$HOME/.local/share/fnm"
+if [ -f "$FNM_DIR/fnm" ]; then
+    add_path "$FNM_DIR"
+    eval "$(fnm env --use-on-cd 2>/dev/null)"
 fi
 {{ end -}}
 

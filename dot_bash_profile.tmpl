@@ -1,0 +1,7 @@
+{{ if ne .chezmoi.os "windows" -}}
+# ─── bash_profile: loaded by login shells ───
+# Chain-load bashrc (interactive config) and profile (session config)
+
+[ -f ~/.bashrc ] && . ~/.bashrc
+[ -f ~/.profile ] && . ~/.profile
+{{ end -}}
