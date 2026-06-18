@@ -1,0 +1,20 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
+    "ANTHROPIC_AUTH_TOKEN": "{{ .claude_api_token | default "" }}",
+    "ANTHROPIC_MODEL": "deepseek-v4-pro[1m]",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-v4-pro[1m]",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "deepseek-v4-pro[1m]",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-v4-flash",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "deepseek-v4-flash",
+    "CLAUDE_CODE_EFFORT_LEVEL": "max",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_DISABLE_NONSTREAMING_FALLBACK": "1",
+    "http_proxy": "http://202.112.180.24:10808",
+    "HTTP_PROXY": "http://202.112.180.24:10808",
+    "HTTPS_PROXY": "http://202.112.180.24:10808",
+    "ALL_PROXY": "http://202.112.180.24:10808",
+    "no_proxy": "localhost,127.0.0.1,::1,.local"
+  },
+  "model": "deepseek-v4-pro[1m]"
+}
