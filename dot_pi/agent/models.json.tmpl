@@ -1,0 +1,74 @@
+{
+  "providers": {
+    "stepfun": {
+      "name": "StepFun Step Plan",
+      "baseUrl": "https://api.stepfun.com/step_plan/v1",
+      "apiKey": "{{ .stepfun_api_key }}",
+      "api": "openai-completions",
+      "compat": {
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": true,
+        "supportsUsageInStreaming": true,
+        "maxTokensField": "max_tokens"
+      },
+      "models": [
+        {
+          "id": "step-3.7-flash",
+          "name": "Step 3.7 Flash (多模态推理)",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 128000,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+          "thinkingLevelMap": {
+            "low": "low",
+            "medium": "medium",
+            "high": "high"
+          }
+        },
+        {
+          "id": "step-3.5-flash-2603",
+          "name": "Step 3.5 Flash 2603 (Agent优化)",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 128000,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+          "thinkingLevelMap": {
+            "low": "low",
+            "medium": "medium",
+            "high": "high"
+          }
+        },
+        {
+          "id": "step-3.5-flash",
+          "name": "Step 3.5 Flash",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 128000,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+          "thinkingLevelMap": {
+            "low": "low",
+            "medium": "medium",
+            "high": "high"
+          }
+        },
+        {
+          "id": "step-router-v1",
+          "name": "Step Router V1 (智能路由)",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 128000,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+          "thinkingLevelMap": {
+            "low": "low",
+            "medium": "medium",
+            "high": "high"
+          }
+        }
+      ]
+    }
+  }
+}
