@@ -1,0 +1,28 @@
+[[language]]
+name = "python"
+language-servers = ["ruff", "pylsp"]
+formatter = { command = "ruff", args = ["format", "-"] }
+auto-format = true
+
+[language-server.ruff]
+command = "ruff"
+args = ["server"]
+
+[language-server.pylsp]
+command = "pylsp"
+
+[language-server.pylsp.config.pylsp.plugins.pycodestyle]
+enabled = false
+[language-server.pylsp.config.pylsp.plugins.mccabe]
+enabled = false
+[language-server.pylsp.config.pylsp.plugins.pyflakes]
+enabled = false
+
+[[language]]
+name = "r"
+language-servers = [ "r-languageserver" ]
+auto-format = true
+
+[language-server.r-languageserver]
+command = "R"
+args = ["--slave", "-e", "languageserver::run()"]

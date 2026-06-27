@@ -1,0 +1,9 @@
+[editor]
+# 默认启用软换行（同 VSCode 的 word wrap）
+
+[editor.soft-wrap]
+enable = true
+
+[keys.normal]
+# Alt + z 快速切换 wrap 开关（同 VSCode）
+"A-z" = ":toggle soft-wrap.enable"
