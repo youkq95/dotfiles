@@ -1,17 +1,17 @@
 #!/bin/bash
 # chezmoi: run_once
-# 安装常用终端工具 (仅 Linux)
+# 安装常用终端工具 (Linux/macOS)
 
-{{ if eq .chezmoi.os "linux" -}}
+{{ if or (eq .chezmoi.os "linux") (eq .chezmoi.os "darwin") -}}
 
-set -e
+set -euo pipefail
 
-echo "🔧 检查并安装工具 (Linux)..."
+echo "🔧 检查并安装工具 ({{ .chezmoi.os }})..."
 
 # ─── Starship ───
 if ! command -v starship &>/dev/null; then
     echo "  -> 安装 Starship..."
-    curl -sS https://starship.rs/install.sh | sh /dev/stdin --yes -b ~/.local/bin
+    curl -fsSL --proto '=https' --tlsv1.2 https://starship.rs/install.sh | sh /dev/stdin --yes -b ~/.local/bin
     echo "  ✅ Starship 安装完成"
 else
     echo "  ✅ Starship 已安装 ($(starship --version))"
@@ -20,7 +20,7 @@ fi
 # ─── zoxide ───
 if ! command -v zoxide &>/dev/null; then
     echo "  -> 安装 zoxide..."
-    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+    curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
     echo "  ✅ zoxide 安装完成"
 else
     echo "  ✅ zoxide 已安装 ($(zoxide --version))"
@@ -29,5 +29,5 @@ fi
 echo "🎉 所有工具检查完毕!"
 
 {{ else -}}
-echo "⏭️  跳过工具安装 (非 Linux 平台: {{ .chezmoi.os }})"
+echo "⏭️  跳过工具安装 (非 Unix 平台: {{ .chezmoi.os }})"
 {{ end -}}

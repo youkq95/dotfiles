@@ -1,0 +1,65 @@
+# ============================================================
+# SSH config — chezmoi managed
+# Hostname: {{ .chezmoi.hostname }}
+# ============================================================
+
+{{ $identityFile := "~/.ssh/id_ed25519" -}}
+{{ $isLab26 := or (eq .chezmoi.hostname "lab26") (eq .chezmoi.hostname "gpu-public") -}}
+{{ if eq .chezmoi.hostname "ps" -}}
+{{ $identityFile = "~/.ssh/id_rsa" -}}
+{{ end -}}
+
+# ─── Remote hosts ───
+# Unknown hostnames (例如新 Mac) 默认按普通客户端处理。
+{{ if ne .chezmoi.hostname "ps" -}}
+Host ps
+    HostName 222.28.103.242
+    Port 22
+    User kos
+    IdentityFile {{ $identityFile }}
+
+{{ end -}}
+Host ykq42
+    HostName 222.28.103.242
+    Port 22
+    User ykq
+    IdentityFile {{ $identityFile }}
+
+{{ if ne .chezmoi.hostname "lab24" -}}
+Host lab24
+    HostName 202.112.180.24
+    Port 22
+    User ykq
+    IdentityFile {{ $identityFile }}
+
+{{ end -}}
+{{ if not $isLab26 -}}
+Host lab26
+    HostName 202.112.180.26
+    Port 22
+    User ykq
+    IdentityFile {{ $identityFile }}
+
+{{ end -}}
+{{ if ne .chezmoi.hostname "lab148" -}}
+Host lab148
+    HostName 222.28.103.241
+    Port 2222
+    User ykq
+    IdentityFile {{ $identityFile }}
+
+{{ end -}}
+
+# ─── GitHub ───
+Host github.com
+    HostName github.com
+    User git
+    PreferredAuthentications publickey
+    IdentityFile ~/.ssh/id_rsa_github
+
+# ─── 全局默认配置 ───
+Host *
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    TCPKeepAlive yes
+    StrictHostKeyChecking ask

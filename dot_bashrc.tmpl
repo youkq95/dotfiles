@@ -12,7 +12,7 @@
 # Windows: 添加 chezmoi 和常用工具到 PATH
 export PATH="$HOME/bin:$HOME/scoop/shims:/c/Program Files/nodejs:$PATH"
 {{ else -}}
-# Linux: 标准路径 (仅添加尚未存在的路径，防止重复)
+# Unix: 标准路径 (仅添加尚未存在的路径，防止重复)
 add_path() {
     case ":$PATH:" in
         *:"$1":*) ;;
@@ -26,13 +26,7 @@ add_path "$HOME/.pixi/bin"
 {{ end -}}
 
 # ─── Editor ───
-{{ if eq .chezmoi.os "windows" -}}
-export EDITOR="code --wait"
-export VISUAL="code --wait"
-{{ else -}}
-export EDITOR="hx"
-export VISUAL="hx"
-{{ end -}}
+# 编辑器由目标机器的环境变量或用户配置决定，不在这里强制指定。
 
 # ─── Prompt ───
 {{ if eq .chezmoi.hostname "DESKTOP-KNUNJ5V" -}}
@@ -42,7 +36,7 @@ export PS1='\[\033[01;32m\]\u@home\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 # 生产服务器 — 红色提示
 export PS1='\[\033[01;31m\]\u@PROD\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 {{ else -}}
-# 通用 Linux prompt
+# 通用 Unix prompt
 export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 {{ end -}}
 
@@ -110,7 +104,7 @@ if command -v chezmoi &>/dev/null; then
 fi
 
 # ─── 今日记录 ───
-alias today='hx ~/brain/today.md'
+alias today='${EDITOR:-vi} ~/brain/today.md'
 
 k() {
   printf "\n- %s: %s\n" "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> ~/brain/log.md
@@ -141,6 +135,9 @@ proxy_on() {
     export HTTPS_PROXY="${https_proxy}"
     export ALL_PROXY="${all_proxy}"
 
+    export no_proxy="localhost,127.0.0.1,::1,.local,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+    export NO_PROXY="${no_proxy}"
+
     [[ $- == *i* ]] && echo "✅ 代理已开启 (HTTP Proxy: ${http_proxy})"
 }
 
@@ -153,6 +150,9 @@ proxy_off() {
     unset HTTPS_PROXY
     unset ALL_PROXY
 
+    unset no_proxy
+    unset NO_PROXY
+
     echo "❌ 代理已关闭"
 }
 
@@ -163,6 +163,7 @@ proxy_status() {
         echo "http_proxy:   $http_proxy"
         echo "https_proxy:  $https_proxy"
         echo "all_proxy:    $all_proxy"
+        echo "no_proxy:     $no_proxy"
         echo "-------------------------"
     else
         echo "当前代理状态: 关闭"
@@ -171,4 +172,22 @@ proxy_status() {
 
 # 默认开启代理（仅交互式 shell）
 [[ $- == *i* ]] && proxy_on
+{{ end -}}
+
+{{ if ne .chezmoi.os "windows" -}}
+# ─── Optional local tool integrations ───
+# These files are installed by the tools themselves and are not managed here.
+[ -r "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+if [ -r "$HOME/.grok/completions/bash/grok.bash" ]; then
+    add_path "$HOME/.grok/bin"
+    . "$HOME/.grok/completions/bash/grok.bash"
+fi
+
+if [ -r "$HOME/google-cloud-sdk/path.bash.inc" ]; then
+    . "$HOME/google-cloud-sdk/path.bash.inc"
+    [ -r "$HOME/google-cloud-sdk/completion.bash.inc" ] && . "$HOME/google-cloud-sdk/completion.bash.inc"
+fi
+
+export SLOCK_DAEMON_RUNTIME_START_TIMEOUT_MS="${SLOCK_DAEMON_RUNTIME_START_TIMEOUT_MS:-1200000}"
 {{ end -}}

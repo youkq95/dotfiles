@@ -6,22 +6,23 @@
 # Windows — 通过 bash 调用 PowerShell
 powershell -NoLogo -NonInteractive -Command - << 'PSEOF'
 $sshDir = "$env:USERPROFILE\.ssh"
+$windowsUser = $env:USERNAME
 if (Test-Path $sshDir) {
-    icacls $sshDir /inheritance:r /grant "Yuyu:(OI)(CI)F" /grant "SYSTEM:(OI)(CI)F" > $null 2>&1
+    icacls $sshDir /inheritance:r /grant "${windowsUser}:(OI)(CI)F" /grant "SYSTEM:(OI)(CI)F" > $null 2>&1
     $configFile = "$sshDir\config"
-    if (Test-Path $configFile) { icacls $configFile /inheritance:r /grant "Yuyu:F" > $null 2>&1 }
+    if (Test-Path $configFile) { icacls $configFile /inheritance:r /grant "${windowsUser}:F" > $null 2>&1 }
     $keysDir = "$sshDir\authorized_keys.d"
     if (Test-Path $keysDir) {
-        Get-ChildItem "$keysDir\*.pub" | ForEach-Object { icacls $_.FullName /inheritance:r /grant "Yuyu:F" > $null 2>&1 }
+        Get-ChildItem "$keysDir\*.pub" | ForEach-Object { icacls $_.FullName /inheritance:r /grant "${windowsUser}:F" > $null 2>&1 }
     }
     $authKeys = "$sshDir\authorized_keys"
-    if (Test-Path $authKeys) { icacls $authKeys /inheritance:r /grant "Yuyu:F" > $null 2>&1 }
+    if (Test-Path $authKeys) { icacls $authKeys /inheritance:r /grant "${windowsUser}:F" > $null 2>&1 }
 }
 PSEOF
 exit $?
 
 {{ else -}}
-# Linux
+# Linux/macOS
 SSH_DIR="{{ .chezmoi.homeDir }}/.ssh"
 
 if [ -d "$SSH_DIR" ]; then
@@ -32,8 +33,8 @@ if [ -d "$SSH_DIR" ]; then
     chmod 600 "$SSH_DIR/authorized_keys" 2>/dev/null || true
     chmod 644 "$SSH_DIR/known_hosts" 2>/dev/null || true
     if [ -d "$SSH_DIR/authorized_keys.d" ]; then
-        chmod 755 "$SSH_DIR/authorized_keys.d"
-        chmod 644 "$SSH_DIR/authorized_keys.d"/*.pub 2>/dev/null || true
+        chmod 700 "$SSH_DIR/authorized_keys.d"
+        chmod 600 "$SSH_DIR/authorized_keys.d"/*.pub 2>/dev/null || true
     fi
 fi
 

@@ -6,7 +6,7 @@
 
 - ✅ Windows (Git Bash / PowerShell)
 - ✅ Linux (Ubuntu/Debian, CentOS)
-- ⏳ macOS (待添加)
+- ✅ macOS (Unix 通用配置)
 
 ## 快速部署到新机器
 
@@ -45,8 +45,15 @@ chezmoi update            # 拉取远程更新并应用
 chezmoi cd                # 进入源仓库目录
 ```
 
+## 新机器上的凭据
+
+API 凭据不放入仓库。首次 `chezmoi init` 时会询问
+`claude_api_token`、`deepseek_api_key` 和 `stepfun_api_key`，并将结果保存在
+本机 `~/.config/chezmoi/chezmoi.toml`；该文件应设置为仅用户可读
+（`chmod 600`）。
+
 ## 跨平台注意事项
 
-- `.gitconfig`: Windows 使用 `autocrlf=true` + VS Code，Linux 使用 `autocrlf=input` + Neovim
+- `.gitconfig`: Windows 使用 `autocrlf=true` + VS Code，Unix 使用 `autocrlf=input`，编辑器由目标机器决定
 - `.bashrc`: 根据 OS 和主机名调整 PATH、别名、prompt
 - `run_once_*`: 只在首次部署时执行，Windows 用 PowerShell，Linux 用 bash

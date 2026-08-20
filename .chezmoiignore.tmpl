@@ -15,8 +15,17 @@ run_assemble-authorized-keys.sh*
 run_fix-ssh-perms.sh*
 {{ end -}}
 
-# Linux 忽略 Windows 专用文件
-{{ if eq .chezmoi.os "linux" -}}
+# macOS 忽略 Linux 桌面专用文件，但保留通用 shell 脚本
+{{ if eq .chezmoi.os "darwin" -}}
+.Xresources
+.xinitrc
+.config/i3/
+.config/sway/
+.config/waybar/
+{{ end -}}
+
+# Unix 系统忽略 Windows 专用文件
+{{ if or (eq .chezmoi.os "linux") (eq .chezmoi.os "darwin") -}}
 Microsoft.PowerShell_profile.ps1
 .config/WindowsTerminal/
 run_once_before_setup.ps1*

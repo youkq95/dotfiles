@@ -3,7 +3,7 @@
     "stepfun": {
       "name": "StepFun Step Plan",
       "baseUrl": "https://api.stepfun.com/step_plan/v1",
-      "apiKey": "{{ .stepfun_api_key }}",
+      "apiKey": "{{ .stepfun_api_key | default "" }}",
       "api": "openai-completions",
       "compat": {
         "supportsDeveloperRole": false,
