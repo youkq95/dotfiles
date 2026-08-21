@@ -50,6 +50,12 @@ Host lab148
 
 {{ end -}}
 
+Host puersai-hpc
+    HostName 100.126.14.66
+    Port 22
+    User ps
+    IdentityFile {{ $identityFile }}
+
 # ─── GitHub ───
 Host github.com
     HostName github.com
