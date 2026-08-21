@@ -8,10 +8,6 @@
 
 # 按机器自定义数据
 [data]
-    # 首次初始化时询问；值保存在本机配置，不进入 Git
-    claude_api_token = {{ promptStringOnce . "claude_api_token" "Claude API token (可留空)" | quote }}
-    deepseek_api_key = {{ promptStringOnce . "deepseek_api_key" "DeepSeek API key (可留空)" | quote }}
-    stepfun_api_key = {{ promptStringOnce . "stepfun_api_key" "StepFun API key (可留空)" | quote }}
     # 校园网内机器才需要代理
     proxy_enabled = {{ if or (eq .chezmoi.hostname "lab24") (eq .chezmoi.hostname "lab148") (eq .chezmoi.hostname "gpu-public") (eq .chezmoi.hostname "ps") }}true{{ else }}false{{ end }}
 

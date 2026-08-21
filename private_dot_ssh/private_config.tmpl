@@ -50,16 +50,13 @@ Host lab148
 
 {{ end -}}
 
-# ─── GitHub ───
-Host github.com
-    HostName github.com
-    User git
-    PreferredAuthentications publickey
-    IdentityFile ~/.ssh/id_rsa_github
-
 # ─── 全局默认配置 ───
 Host *
     ServerAliveInterval 60
     ServerAliveCountMax 3
     TCPKeepAlive yes
     StrictHostKeyChecking ask
+{{ if eq .chezmoi.os "darwin" }}
+    AddKeysToAgent yes
+    UseKeychain yes
+{{ end }}
