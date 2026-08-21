@@ -1,0 +1,47 @@
+{{ if ne .chezmoi.os "windows" -}}
+# ============================================================
+# .zshrc — chezmoi managed
+# ============================================================
+
+# PATH
+add_path() {
+    case ":$PATH:" in
+        *:"$1":*) ;;
+        *) export PATH="$1:$PATH" ;;
+    esac
+}
+add_path "$HOME/.local/bin"
+add_path "$HOME/go/bin"
+add_path "$HOME/bin"
+add_path "$HOME/.pixi/bin"
+
+# Aliases
+alias ll='ls -lah'
+alias la='ls -A'
+alias lt='ls -lart'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias df='df -h'
+alias du='du -h'
+alias cp='cp -i'
+alias mv='mv -i'
+alias rm='rm -i'
+
+# chezmoi
+alias dotfiles='chezmoi'
+alias dot-edit='chezmoi edit'
+alias dot-update='chezmoi update'
+if command -v chezmoi >/dev/null 2>&1 && (( $+functions[compdef] )); then
+    source <(chezmoi completion zsh 2>/dev/null) || true
+fi
+
+# Starship is installed separately; do not install it from chezmoi.
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi
+
+# zoxide is optional and will be enabled automatically once installed.
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh --cmd j)"
+fi
+{{ end -}}

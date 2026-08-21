@@ -69,3 +69,7 @@ Host *
     ServerAliveCountMax 3
     TCPKeepAlive yes
     StrictHostKeyChecking ask
+{{ if eq .chezmoi.os "darwin" }}
+    AddKeysToAgent yes
+    UseKeychain yes
+{{ end }}

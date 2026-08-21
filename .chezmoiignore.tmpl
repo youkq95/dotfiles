@@ -22,6 +22,9 @@ run_fix-ssh-perms.sh*
 .config/i3/
 .config/sway/
 .config/waybar/
+# This Mac is an SSH client; keep server-side authorized_keys out of it.
+.ssh/authorized_keys.d/
+assemble-authorized-keys.sh*
 {{ end -}}
 
 # Unix 系统忽略 Windows 专用文件
