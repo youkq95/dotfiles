@@ -35,6 +35,13 @@ if command -v chezmoi >/dev/null 2>&1 && (( $+functions[compdef] )); then
     source <(chezmoi completion zsh 2>/dev/null) || true
 fi
 
+# zsh-autosuggestions is installed by chezmoi as an external git repository.
+_zsh_autosuggestions="$HOME/.local/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+if [[ -r "$_zsh_autosuggestions" ]]; then
+    source "$_zsh_autosuggestions"
+fi
+unset _zsh_autosuggestions
+
 # Starship is installed separately; do not install it from chezmoi.
 if command -v starship >/dev/null 2>&1; then
     eval "$(starship init zsh)"

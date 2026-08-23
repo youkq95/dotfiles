@@ -1,0 +1,6 @@
+{{ if ne .chezmoi.os "windows" -}}
+[".local/share/zsh/plugins/zsh-autosuggestions"]
+    type = "git-repo"
+    url = "https://github.com/zsh-users/zsh-autosuggestions.git"
+    refreshPeriod = "168h"
+{{ end -}}
