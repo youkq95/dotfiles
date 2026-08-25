@@ -1,0 +1,5 @@
+#!/bin/sh
+# Launch Pi with Cindy's Nowledge Mem identity and space.
+export NMEM_AGENT_ID=cindy
+export NMEM_SPACE=cindy
+exec pi "$@"

@@ -15,6 +15,13 @@ add_path "$HOME/go/bin"
 add_path "$HOME/bin"
 add_path "$HOME/.pixi/bin"
 
+# Node.js (fnm)
+export FNM_DIR="$HOME/.local/share/fnm"
+if [[ -x "$FNM_DIR/fnm" ]]; then
+    add_path "$FNM_DIR"
+    eval "$(fnm env --use-on-cd --shell zsh 2>/dev/null)"
+fi
+
 # Aliases
 alias ll='ls -lah'
 alias la='ls -A'
@@ -51,6 +58,49 @@ fi
 if command -v zoxide >/dev/null 2>&1; then
     eval "$(zoxide init zsh --cmd j)"
 fi
+
+{{ if and (eq .chezmoi.os "linux") .proxy_enabled -}}
+# Proxy settings
+proxy_on() {
+    local proxy_host="222.28.103.241"
+    local http_port="10808"
+    local socks_port="10808"
+
+    export http_proxy="http://${proxy_host}:${http_port}"
+    export https_proxy="${http_proxy}"
+    export all_proxy="socks5://${proxy_host}:${socks_port}"
+    export HTTP_PROXY="${http_proxy}"
+    export HTTPS_PROXY="${https_proxy}"
+    export ALL_PROXY="${all_proxy}"
+    export no_proxy="localhost,127.0.0.1,::1,.local,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,222.28.103.241"
+    export NO_PROXY="${no_proxy}"
+
+    [[ -o interactive ]] && echo "✅ 代理已开启 (HTTP Proxy: ${http_proxy})"
+}
+
+proxy_off() {
+    unset http_proxy https_proxy all_proxy
+    unset HTTP_PROXY HTTPS_PROXY ALL_PROXY
+    unset no_proxy NO_PROXY
+    echo "❌ 代理已关闭"
+}
+
+proxy_status() {
+    if [[ -n "$http_proxy" ]]; then
+        echo "当前代理状态: 开启"
+        echo "http_proxy:  $http_proxy"
+        echo "https_proxy: $https_proxy"
+        echo "all_proxy:   $all_proxy"
+        echo "no_proxy:    $no_proxy"
+    else
+        echo "当前代理状态: 关闭"
+    fi
+}
+
+[[ -o interactive ]] && proxy_on
+{{ end -}}
+
+export SLOCK_DAEMON_RUNTIME_START_TIMEOUT_MS="${SLOCK_DAEMON_RUNTIME_START_TIMEOUT_MS:-1200000}"
 
 # Keep zsh-syntax-highlighting last so it can wrap all previously defined widgets.
 _zsh_syntax_highlighting="$HOME/.local/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
