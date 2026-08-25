@@ -5,9 +5,9 @@ if command -v brew >/dev/null 2>&1; then
 fi
 
 {{ if eq .chezmoi.os "darwin" -}}
-# Homebrew mirrors used on this Mac.
-export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
-export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
+# Use the official Git repositories while retaining TUNA download acceleration.
+export HOMEBREW_BREW_GIT_REMOTE="https://github.com/Homebrew/brew.git"
+export HOMEBREW_CORE_GIT_REMOTE="https://github.com/Homebrew/homebrew-core.git"
 export HOMEBREW_API_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles/api"
 export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
 export HOMEBREW_PIP_INDEX_URL="https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
