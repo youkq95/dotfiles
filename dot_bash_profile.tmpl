@@ -1,6 +1,6 @@
 {{ if ne .chezmoi.os "windows" -}}
 # ─── bash_profile: loaded by login shells ───
-# Chain-load bashrc (interactive config) and profile (session config)
+# Chain-load bashrc (interactive config)
 
 # Keep common user tools available to non-interactive login shells too.
 case ":$PATH:" in
@@ -10,5 +10,4 @@ esac
 [ -r "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
 [ -f ~/.bashrc ] && . ~/.bashrc
-[ -f ~/.profile ] && . ~/.profile
 {{ end -}}

@@ -65,8 +65,13 @@ proxy_on() {
     local proxy_host="222.28.103.241"
     local http_port="10808"
     local socks_port="10808"
+    local target_http="http://${proxy_host}:${http_port}"
 
-    export http_proxy="http://${proxy_host}:${http_port}"
+    if [[ "$http_proxy" == "$target_http" ]]; then
+        return 0
+    fi
+
+    export http_proxy="${target_http}"
     export https_proxy="${http_proxy}"
     export all_proxy="socks5://${proxy_host}:${socks_port}"
     export HTTP_PROXY="${http_proxy}"
