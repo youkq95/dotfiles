@@ -23,6 +23,12 @@ if [[ -x "$FNM_DIR/fnm" ]]; then
     eval "$(fnm env --use-on-cd --shell zsh 2>/dev/null)"
 fi
 
+# Google Cloud SDK
+if [[ -d "$HOME/google-cloud-sdk/bin" ]]; then
+    add_path "$HOME/google-cloud-sdk/bin"
+    [[ -r "$HOME/google-cloud-sdk/completion.zsh.inc" ]] && source "$HOME/google-cloud-sdk/completion.zsh.inc"
+fi
+
 # Aliases
 alias ll='ls -lah'
 alias la='ls -A'
