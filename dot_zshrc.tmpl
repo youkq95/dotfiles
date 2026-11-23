@@ -114,6 +114,16 @@ proxy_status() {
 
 export SLOCK_DAEMON_RUNTIME_START_TIMEOUT_MS="${SLOCK_DAEMON_RUNTIME_START_TIMEOUT_MS:-1200000}"
 
+# Unified Nowledge Mem context across agent tools.
+export NMEM_AGENT_ID=default
+export NMEM_SPACE=default
+unset NMEM_HOST_AGENT_ID
+
+# Local private environment / secrets (gitignored, managed per-machine)
+if [[ -r "$HOME/.zshrc.local" ]]; then
+    source "$HOME/.zshrc.local"
+fi
+
 # Keep zsh-syntax-highlighting last so it can wrap all previously defined widgets.
 _zsh_syntax_highlighting="$HOME/.local/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 if [[ -r "$_zsh_syntax_highlighting" ]]; then
