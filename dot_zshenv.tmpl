@@ -1,0 +1,26 @@
+# ============================================================
+# .zshenv — chezmoi managed (dot_zshenv.tmpl)
+# Platform: {{ .chezmoi.os }}
+# Hostname: {{ .chezmoi.hostname }}
+# ============================================================
+
+# Rust / Cargo environment
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+# Private API keys for Pi extensions
+[ -f "$HOME/.config/pi/secrets.env" ] && . "$HOME/.config/pi/secrets.env"
+
+{{ if and (eq .chezmoi.os "linux") .proxy_enabled -}}
+# Proxy for non-interactive SSH (e.g. Antigravity Remote SSH)
+export http_proxy="http://222.28.103.241:10808"
+export https_proxy="$http_proxy"
+export all_proxy="socks5h://222.28.103.241:10808"
+export HTTP_PROXY="$http_proxy"
+export HTTPS_PROXY="$https_proxy"
+export ALL_PROXY="$all_proxy"
+export no_proxy="localhost,127.0.0.1,::1,.local,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,222.28.103.241"
+export NO_PROXY="$no_proxy"
+{{ end -}}
+
+# Local per-machine overrides (not managed by chezmoi)
+[ -r "$HOME/.zshenv.local" ] && . "$HOME/.zshenv.local"

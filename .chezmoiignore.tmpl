@@ -34,3 +34,13 @@ Microsoft.PowerShell_profile.ps1
 run_once_before_setup.ps1*
 setup.ps1*
 {{ end -}}
+
+# 仅在 Linux 上托管 .zshenv（避免覆盖 macOS/Windows 已有配置）
+{{ if ne .chezmoi.os "linux" -}}
+.zshenv
+{{ end -}}
+
+# 仅在开启代理的 Linux 机器上生成 .curlrc
+{{ if not (and (eq .chezmoi.os "linux") .proxy_enabled) -}}
+.curlrc
+{{ end -}}
